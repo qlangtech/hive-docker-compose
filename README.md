@@ -51,6 +51,24 @@ CREATE EXTERNAL TABLE parquet_table (
 STORED AS PARQUET;
 insert into parquet_table (foo,bar) values(1,'xxxx' );
 ```
+PARQUET格式，带分区
+```
+CREATE TABLE IF NOT EXISTS sales_data (
+    sale_id STRING,
+    product_name STRING,
+    quantity_sold INT,
+    price DOUBLE
+)
+PARTITIONED BY (year INT, month INT)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS PARQUET;
+
+INSERT INTO TABLE sales_data PARTITION (year=2023, month=1)
+VALUES 
+('s001', 'ProductA', 15, 19.99),
+('s002', 'ProductB', 20, 29.99),
+('s003', 'ProductC', 25, 9.99);
+```
 
 ## Contributors
 * Ivan Ermilov [@earthquakesan](https://github.com/earthquakesan) (maintainer)
