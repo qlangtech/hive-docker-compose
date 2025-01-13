@@ -42,6 +42,15 @@ Then query it from PrestoDB. You can get [presto.jar](https://prestosql.io/docs/
   $ ./presto.jar --server localhost:8080 --catalog hive --schema default
   presto> select * from pokes;
 ```
+测试PARQUET格式：
+```
+CREATE EXTERNAL TABLE parquet_table (
+    foo INT,
+    bar STRING
+)
+STORED AS PARQUET;
+insert into parquet_table (foo,bar) values(1,'xxxx' );
+```
 
 ## Contributors
 * Ivan Ermilov [@earthquakesan](https://github.com/earthquakesan) (maintainer)
