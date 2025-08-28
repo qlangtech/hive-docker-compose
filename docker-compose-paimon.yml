@@ -29,7 +29,10 @@ services:
       - ./hadoop-hive.env
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar"
       SERVICE_PRECONDITION: "hive-metastore:9083"
+    volumes:
+      - ./paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar
     ports:
       - "10000:10000"
   hive-metastore:
@@ -38,7 +41,10 @@ services:
       - ./hadoop-hive.env
     command: /opt/hive/bin/hive --service metastore
     environment:
+      HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar"
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
+    volumes:
+      - ./paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar
     ports:
       - "9083:9083"
   hive-metastore-postgresql:
