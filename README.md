@@ -1,5 +1,10 @@
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/big-data-europe/Lobby)
 
+# support paimon 
+in order to support paimin in Hive engine
+1. download hive supoort jar: `wget https://repo.maven.apache.org/maven2/org/apache/paimon/paimon-hive-connector-2.3/1.1.1/paimon-hive-connector-2.3-1.1.1.jar`
+2. using config file `docker-compose-paimon.yml` to launch docker-compose environment
+
 # docker-hive
 
 This is a docker container for Apache Hive 2.3.2. It is based on https://github.com/big-data-europe/docker-hadoop so check there for Hadoop configurations.
