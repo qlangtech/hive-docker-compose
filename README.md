@@ -3,7 +3,9 @@
 # support paimon 
 in order to support paimin in Hive engine
 1. download hive supoort jar: `wget https://repo.maven.apache.org/maven2/org/apache/paimon/paimon-hive-connector-2.3/1.1.1/paimon-hive-connector-2.3-1.1.1.jar`
-2. using config file `docker-compose-paimon.yml` to launch docker-compose environment
+2. download hadoop-aws jar: `wget http://mirrors.163.com/maven/repository/maven-public/org/apache/hadoop/hadoop-aws/2.7.4/hadoop-aws-2.7.4.jar`
+3. download aws-java-sdk jar: `wget http://mirrors.163.com/maven/repository/maven-public/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar`
+4. using config file `docker-compose-paimon.yml` to launch docker-compose environment
 
 # docker-hive
 
@@ -73,6 +75,55 @@ VALUES
 ('s001', 'ProductA', 15, 19.99),
 ('s002', 'ProductB', 20, 29.99),
 ('s003', 'ProductC', 25, 9.99);
+```
+
+## 使用 MinIO 创建 Database
+
+环境已通过 `hadoop-aws` 和 `aws-java-sdk` 支持 S3A 文件系统，可以创建 LOCATION 指向 `s3a://` 的 Hive Database。
+
+### 前置条件
+确保你有一个可用的 MinIO（或兼容 S3 的存储）实例。
+- 如果你**没有**独立的 MinIO，可以在 `docker-compose-paimon.yml` 中增加 MinIO 服务，或直接使用已有的外部 MinIO。
+- 如果你使用**外部 MinIO**，请修改 `hadoop-hive.env` 中的 endpoint、access_key、secret_key 为你实际的地址和凭据：
+  ```properties
+  CORE_CONF_fs_s3a_endpoint=http://your-minio-host:9000
+  CORE_CONF_fs_s3a_access_key=your-access-key
+  CORE_CONF_fs_s3a_secret_key=your-secret-key
+  ```
+
+### 启动环境
+```bash
+docker-compose -f docker-compose-paimon.yml up -d
+```
+
+### 进入 Hive 并创建 MinIO Database
+```bash
+docker-compose -f docker-compose-paimon.yml exec hive-server bash
+/opt/hive/bin/beeline -u jdbc:hive2://localhost:10000 -n "" -p ""
+```
+
+在 beeline 中执行：
+```sql
+CREATE DATABASE IF NOT EXISTS my_minio_db
+COMMENT 'Database on MinIO'
+LOCATION 's3a://my-bucket/path/to/database';
+```
+
+> **注意**：如果 MinIO 中 `my-bucket` 不存在，部分操作可能会失败。建议提前通过 MinIO Console 或 `mc` 命令行创建该 bucket。
+
+### 验证
+```sql
+SHOW DATABASES;
+DESCRIBE DATABASE EXTENDED my_minio_db;
+```
+
+### 在 MinIO 中提前创建 Bucket（可选）
+如果你本地有 MinIO Console，可以访问 `http://localhost:9001`（若已映射端口），使用凭据登录后手动创建 `my-bucket`。
+
+或者使用 MinIO Client (`mc`)：
+```bash
+mc alias set local http://localhost:9000 minioadmin minioadmin
+mc mb local/my-bucket
 ```
 
 ## Contributors
