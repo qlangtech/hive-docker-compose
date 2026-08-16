@@ -30,11 +30,14 @@ services:
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
       HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar"
+      HADOOP_CLASSPATH: "/opt/hadoop-2.7.4/share/hadoop/common/lib/hadoop-aws-2.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/aws-java-sdk-1.7.4.jar"
       SERVICE_PRECONDITION: "hive-metastore:9083"
     volumes:
       - ./paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar
       - ./hadoop-aws-2.7.4.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar
       - ./aws-java-sdk-1.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar
+      - ./hadoop-aws-2.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/hadoop-aws-2.7.4.jar
+      - ./aws-java-sdk-1.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/aws-java-sdk-1.7.4.jar
     ports:
       - "10000:10000"
   hive-metastore:
@@ -44,11 +47,14 @@ services:
     command: /opt/hive/bin/hive --service metastore
     environment:
       HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar"
+      HADOOP_CLASSPATH: "/opt/hadoop-2.7.4/share/hadoop/common/lib/hadoop-aws-2.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/aws-java-sdk-1.7.4.jar"
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
     volumes:
       - ./paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar
       - ./hadoop-aws-2.7.4.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar
       - ./aws-java-sdk-1.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar
+      - ./hadoop-aws-2.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/hadoop-aws-2.7.4.jar
+      - ./aws-java-sdk-1.7.4.jar:/opt/hadoop-2.7.4/share/hadoop/common/lib/aws-java-sdk-1.7.4.jar
     ports:
       - "9083:9083"
   hive-metastore-postgresql:
