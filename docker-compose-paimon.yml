@@ -27,6 +27,8 @@ services:
     image: bde2020/hive:2.3.2-postgresql-metastore
     env_file:
       - ./hadoop-hive.env
+    depends_on:
+      - minio
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
       HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar"
@@ -41,6 +43,8 @@ services:
     image: bde2020/hive:2.3.2-postgresql-metastore
     env_file:
       - ./hadoop-hive.env
+    depends_on:
+      - minio
     command: /opt/hive/bin/hive --service metastore
     environment:
       HIVE_AUX_JARS_PATH: "/opt/hive/lib/paimon-hive-connector-2.3-1.1.1.jar:/opt/hive/lib/hadoop-aws-2.7.4.jar:/opt/hive/lib/aws-java-sdk-1.7.4.jar"
@@ -53,6 +57,18 @@ services:
       - "9083:9083"
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: baisui
+      MINIO_ROOT_PASSWORD: "12345678"
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
   presto-coordinator:
     image: shawnzhu/prestodb:0.181
     ports:
@@ -62,3 +78,4 @@ services:
 volumes:
   namenode:
   datanode:
+  minio_data:

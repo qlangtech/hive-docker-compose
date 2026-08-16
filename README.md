@@ -79,11 +79,11 @@ VALUES
 
 ## 使用 MinIO 创建 Database
 
-环境已通过 `hadoop-aws` 和 `aws-java-sdk` 支持 S3A 文件系统，可以创建 LOCATION 指向 `s3a://` 的 Hive Database。
+环境已通过 `hadoop-aws` 和 `aws-java-sdk` 支持 S3A 文件系统，可以创建 LOCATION 指向 `s3a://` 的 Hive Database。`docker-compose-paimon.yml` 中已经内置了 MinIO 服务，方便直接测试。
 
 ### 前置条件
-确保你有一个可用的 MinIO（或兼容 S3 的存储）实例。
-- 如果你**没有**独立的 MinIO，可以在 `docker-compose-paimon.yml` 中增加 MinIO 服务，或直接使用已有的外部 MinIO。
+- 默认 MinIO 服务已经随 compose 一起启动，访问地址为 `http://localhost:9000`，Console 地址为 `http://localhost:9001`。
+- 默认凭据为 `baisui / 12345678`，如需修改请同时调整 `docker-compose-paimon.yml` 中的 `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` 和 `hadoop-hive.env` 中的 `CORE_CONF_fs_s3a_access_key` / `CORE_CONF_fs_s3a_secret_key`。
 - 如果你使用**外部 MinIO**，请修改 `hadoop-hive.env` 中的 endpoint、access_key、secret_key 为你实际的地址和凭据：
   ```properties
   CORE_CONF_fs_s3a_endpoint=http://your-minio-host:9000
@@ -94,6 +94,14 @@ VALUES
 ### 启动环境
 ```bash
 docker-compose -f docker-compose-paimon.yml up -d
+```
+
+### 创建 Bucket
+在 Hive 中使用 `s3a://my-bucket/...` 之前，需要先在 MinIO 中创建 `my-bucket`。可以通过 MinIO Console 登录后创建，也可以使用 `mc` 命令行：
+
+```bash
+mc alias set local http://localhost:9000 baisui 12345678
+mc mb local/my-bucket
 ```
 
 ### 进入 Hive 并创建 MinIO Database
@@ -109,21 +117,10 @@ COMMENT 'Database on MinIO'
 LOCATION 's3a://my-bucket/path/to/database';
 ```
 
-> **注意**：如果 MinIO 中 `my-bucket` 不存在，部分操作可能会失败。建议提前通过 MinIO Console 或 `mc` 命令行创建该 bucket。
-
 ### 验证
 ```sql
 SHOW DATABASES;
 DESCRIBE DATABASE EXTENDED my_minio_db;
-```
-
-### 在 MinIO 中提前创建 Bucket（可选）
-如果你本地有 MinIO Console，可以访问 `http://localhost:9001`（若已映射端口），使用凭据登录后手动创建 `my-bucket`。
-
-或者使用 MinIO Client (`mc`)：
-```bash
-mc alias set local http://localhost:9000 minioadmin minioadmin
-mc mb local/my-bucket
 ```
 
 ## Contributors
