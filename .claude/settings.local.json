@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m 'add CORE_CONF_fs_s3a_path_style_access for MinIO S3A compatibility *)"
+    ]
+  }
+}
